@@ -6,7 +6,7 @@ export PATH
 # =================================================
 #  全局配置区 (Configuration as Data)
 # =================================================
-readonly SH_VER="100.0.5.11"
+readonly SH_VER="100.0.5.12"
 readonly GITHUB_RAW_URL="https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master"
 readonly GITHUB_API_URL="https://api.github.com/repos/ylx2016/kernel/releases"
 
@@ -109,6 +109,16 @@ check_sys() {
 			[[ $need_update -eq 0 ]] && apt-get update >/dev/null 2>&1
 			apt-get install ca-certificates -y >/dev/null 2>&1
 			update-ca-certificates >/dev/null 2>&1
+		fi
+	fi
+
+	# 5. 补充底层内核模块管理依赖 (应对极简版 LXC/VPS 模板)
+	if ! command -v lsmod >/dev/null 2>&1; then
+		echo -e "${INFO} 正在补齐系统核心依赖: kmod (提供 lsmod/rmmod 命令) ..."
+		if [[ "${OS_TYPE}" == "CentOS" ]]; then
+			yum install -y kmod >/dev/null 2>&1
+		elif [[ "${OS_TYPE}" == "Debian" ]]; then
+			apt-get install -y kmod >/dev/null 2>&1
 		fi
 	fi
 }
